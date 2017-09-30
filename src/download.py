@@ -48,4 +48,5 @@ def download_list(urls, filetype):
         new_filename = insert_before_extension(filename, ' ' + title)
         os.rename(filename, parse_filename(new_filename))
 
-        print("%s complete!" % new_filename)
+        message = "%s complete!" % new_filename
+        print(message.encode('utf-8'))
