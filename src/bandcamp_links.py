@@ -22,7 +22,8 @@ class DownloadInterface(Album):
 
         links = []
         for track in tracklist:
-            links.extend(track["file"].values())
+            if not track["file"] is None:
+                links.extend(track["file"].values())
 
         return links
 
