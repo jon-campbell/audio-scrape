@@ -10,4 +10,7 @@ def pattern_list(lisp, destination):
             item(filename, destination)
 
 def item(filename, destination):
-    os.renames(filename, "%s/%s" % (destination, filename))
+    try:
+        os.renames(filename, "%s/%s" % (destination.encode('utf-8'), filename.encode('utf-8')))
+    except:
+        print "Couldn't move %s. Bad character or duplicate name." % filename
