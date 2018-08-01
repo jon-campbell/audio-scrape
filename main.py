@@ -15,10 +15,12 @@ class Args(object):
         self.url = argv[1]
 
         try:
-            _, args = getopt.getopt(argv, "f:")
+            _, args = getopt.getopt(argv, "f:n:")
             self.folders = '-f' in args
+            self.no_download = '-n' in args
         except:
             self.folders = False
+            self.no_download = False
 
 
 def get_provider(url):
@@ -51,10 +53,11 @@ def main(argv):
     album_name = provider.album_name
     artist_name = provider.artist
 
-    download.download_list(mp3_links, "mp3")
+    if not args.no_download:
+        download.download_list(mp3_links, "mp3")
 
-    if hasattr(provider, "album_art"):
-        download_album_art(provider.album_art, album_name)
+        if hasattr(provider, "album_art"):
+            download_album_art(provider.album_art, album_name)
 
     if args.folders and album_name and artist_name:
         move_to_folders(album_name, artist_name)
