@@ -16,10 +16,10 @@ class Args(object):
 
         try:
             _, args = getopt.getopt(argv, "f:n:")
-            self.folders = '-f' in args
+            self.no_folders = '-f' in args
             self.no_download = '-n' in args
         except:
-            self.folders = False
+            self.no_folders = False
             self.no_download = False
 
 
@@ -59,7 +59,7 @@ def main(argv):
             if hasattr(provider, "album_art"):
                 download_album_art(provider.album_art, album_name)
 
-        if args.folders and album_name and artist_name:
+        if not args.no_folders and album_name and artist_name:
             move_to_folders(album_name, artist_name)
 
 if __name__ == '__main__':
