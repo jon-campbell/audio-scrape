@@ -12,7 +12,7 @@ from src import khinsider_links
 
 class Args(object):
     def __init__(self, argv):
-        self.url = argv[1]
+        self.urls = filter(lambda arg: arg[0] != "-", argv[1:])
 
         try:
             _, args = getopt.getopt(argv, "f:n:")
@@ -47,20 +47,20 @@ def move_to_folders(album, artist):
 
 def main(argv):
     args = Args(argv)
-    provider = get_provider(args.url)
+    providers = map(get_provider, args.urls)
 
-    mp3_links = provider.links
-    album_name = provider.album_name
-    artist_name = provider.artist
+    for provider in providers:
+        album_name = provider.album_name
+        artist_name = provider.artist
 
-    if not args.no_download:
-        download.download_list(mp3_links, "mp3")
+        if not args.no_download:
+            download.download_list(provider.links, "mp3")
 
-        if hasattr(provider, "album_art"):
-            download_album_art(provider.album_art, album_name)
+            if hasattr(provider, "album_art"):
+                download_album_art(provider.album_art, album_name)
 
-    if args.folders and album_name and artist_name:
-        move_to_folders(album_name, artist_name)
+        if args.folders and album_name and artist_name:
+            move_to_folders(album_name, artist_name)
 
 if __name__ == '__main__':
     main(sys.argv)
