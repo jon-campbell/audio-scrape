@@ -9,22 +9,27 @@ from src import download
 from src import move
 from src import bandcamp_links
 from src import khinsider_links
+from src import apache_links
 
 class Args(object):
     def __init__(self, argv):
         self.urls = filter(lambda arg: arg[0] != "-", argv[1:])
 
         try:
-            _, args = getopt.getopt(argv, "f:n:")
+            _, args = getopt.getopt(argv, "f:n:a:")
             self.no_folders = '-f' in args
             self.no_download = '-n' in args
+            self.is_apache = '-a' in args
         except:
             self.no_folders = False
             self.no_download = False
+            self.is_apache = False
 
 
-def get_provider(url):
-    if "khinsider" in url:
+def get_provider(url, args):
+    if args.is_apache:
+        links_provider = apache_links
+    elif "khinsider" in url:
         links_provider = khinsider_links
     else:
         links_provider = bandcamp_links
@@ -47,7 +52,7 @@ def move_to_folders(album, artist):
 
 def main(argv):
     args = Args(argv)
-    providers = map(get_provider, args.urls)
+    providers = map(lambda u: get_provider(u, args), args.urls)
 
     for provider in providers:
         album_name = provider.album_name
