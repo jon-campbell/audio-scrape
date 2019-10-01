@@ -6,7 +6,7 @@ import re
 
 from album import Album
 
-class DownloadInterface(Album):
+class AlbumDownloadStrategy(Album):
 
     def __init__(self, url):
         self.url = url
@@ -51,7 +51,7 @@ class DownloadInterface(Album):
 
 def main():
     url = "https://downloads.khinsider.com/game-soundtracks/album/flashback-the-quest-for-identity-snes-"
-    dl = DownloadInterface(url)
+    dl = AlbumDownloadStrategy(url)
     print dl.links
 
 if __name__ == '__main__':

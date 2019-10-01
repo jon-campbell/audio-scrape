@@ -7,7 +7,7 @@ import json
 
 from album import Album
 
-class DownloadInterface(Album):
+class AlbumDownloadStrategy(Album):
 
     def __init__(self, url):
         self.url = url

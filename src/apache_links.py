@@ -41,7 +41,7 @@ class DownloadInterface(Album):
 
 def main():
     url = "http://neilcic.com/mouthmisc/"
-    dl = DownloadInterface(url)
+    dl = AlbumDownloadStrategy(url)
     print dl.links
 
 if __name__ == '__main__':

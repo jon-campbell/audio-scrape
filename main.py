@@ -26,15 +26,15 @@ class Args(object):
             self.is_apache = False
 
 
-def get_provider(url, args):
+def get_strategy(url, args):
     if args.is_apache:
-        links_provider = apache_links
+        match = apache_links
     elif "khinsider" in url:
-        links_provider = khinsider_links
+        match = khinsider_links
     else:
-        links_provider = bandcamp_links
+        match = bandcamp_links
 
-    return links_provider.DownloadInterface(url)
+    return match.AlbumDownloadStrategy(url)
 
 def download_album_art(rel, name):
     try:
@@ -60,17 +60,17 @@ def move_to_folders(album, artist):
 
 def main(argv):
     args = Args(argv)
-    providers = map(lambda url: get_provider(url, args), args.urls)
+    strategies = map(lambda url: get_strategy(url, args), args.urls)
 
-    for provider in providers:
-        album_name = provider.album_name
-        artist_name = provider.artist
+    for strategy in strategies:
+        album_name = strategy.album_name
+        artist_name = strategy.artist
 
         if not args.no_download:
-            download.download_list(provider.links, "mp3")
+            download.download_list(strategy.links, "mp3")
 
-            if hasattr(provider, "album_art"):
-                download_album_art(provider.album_art, 'cover')
+            if hasattr(strategy, "album_art"):
+                download_album_art(strategy.album_art, 'cover')
 
         if not args.no_folders and album_name and artist_name:
             move_to_folders(album_name, artist_name)
