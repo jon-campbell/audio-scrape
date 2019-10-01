@@ -31,8 +31,8 @@ class DownloadInterface(Album):
     def artist(self):
         name = None
         for line in urllib.urlopen(self.url).readlines():
-            if re.match(r"^\s*name: ", line):
                 name = re.search(r'".*,$', line).group(0)[1:-2]
+            if re.match(r"^\s*artist: ", line):
                 break
 
         return name
