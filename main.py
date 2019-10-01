@@ -52,7 +52,7 @@ def move_to_folders(album, artist):
 
 def main(argv):
     args = Args(argv)
-    providers = map(lambda u: get_provider(u, args), args.urls)
+    providers = map(lambda url: get_provider(url, args), args.urls)
 
     for provider in providers:
         album_name = provider.album_name
@@ -62,7 +62,7 @@ def main(argv):
             download.download_list(provider.links, "mp3")
 
             if hasattr(provider, "album_art"):
-                download_album_art(provider.album_art, album_name)
+                download_album_art(provider.album_art, 'cover')
 
         if not args.no_folders and album_name and artist_name:
             move_to_folders(album_name, artist_name)
