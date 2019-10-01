@@ -32,7 +32,7 @@ class DownloadInterface(Album):
         name = None
         for line in urllib.urlopen(self.url).readlines():
             if re.match(r"^\s*artist: ", line):
-                name = self.clean_name(re.search(r'".*,$', line).group(0)[1:-2])
+                name = re.search(r'".*,$', line).group(0)[1:-2]
                 break
 
         return name
@@ -42,7 +42,7 @@ class DownloadInterface(Album):
         name = None
         for line in urllib.urlopen(self.url).readlines():
             if re.match(r"^\s*album_title: ", line):
-                name = self.clean_name(re.search(r'".*,$', line).group(0)[1:-2])
+                name = re.search(r'".*,$', line).group(0)[1:-2]
                 break
 
         return name
@@ -54,10 +54,5 @@ class DownloadInterface(Album):
                 return re.search(r'(?<=href=")[^"]*', line).group(0)
 
         return None
-
-    def clean_name(self, name):
-        bad_path_characters = '<>:"/\\|?*'
-
-        return "".join([x if not x in bad_path_characters else '_' for x in name])
 
 

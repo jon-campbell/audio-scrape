@@ -44,11 +44,19 @@ def download_album_art(rel, name):
         pass
 
 def move_to_folders(album, artist):
-    move.pattern_list(["*.mp3", "*.jpg"], album)
-    print "Moved files to %s folder" % album
+    def clean_name(name):
+        bad_path_characters = '<>:"/\\|?*'
 
-    move.item(album, artist)
-    print "Moved album to %s folder" % artist
+        return "".join([x if not x in bad_path_characters else '_' for x in name])
+
+    clean_album = clean_name(album)
+    clean_artist = clean_name(artist)
+
+    move.pattern_list(["*.mp3", "*.jpg"], clean_album)
+    print "Moved files to %s folder" % clean_album
+
+    move.item(clean_album, clean_artist)
+    print "Moved album to %s folder" % clean_artist
 
 def main(argv):
     args = Args(argv)
