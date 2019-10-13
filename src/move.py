@@ -7,21 +7,19 @@ import glob
 def to_folder(album, artist):
     album = clean_name(album)
     artist = clean_name(artist)
-    pattern_list(["*.mp3", "*.jpg"], album)
-    item(album, artist)
+    organise(["*.mp3", "*.jpg"], album, artist)
 
 def clean_name(name):
     bad_path_characters = '<>:"/\\|?*'
     name = "".join([x if not x in bad_path_characters else '_' for x in name])
     return name.strip(".")
 
-def pattern_list(patterns, dest):
-    for pattern in patterns:
-        for file in glob.glob(pattern):
-            item(file, dest)
+def organise(file_patterns, album, artist):
+    for pattern in file_patterns:
+        for item in glob.glob(pattern):
+            dest = "%s/%s/%s" % (artist, album, item)
+            try:
+                os.renames(item, dest)
+            except:
+                print "Couldn't move %s to %s" % (item, dest)
 
-def item(src, dest):
-    try:
-        os.renames(src, "%s/%s" % (dest.encode('utf-8'), src.encode('utf-8')))
-    except:
-        print "Couldn't move %s. Bad character or duplicate name." % src
