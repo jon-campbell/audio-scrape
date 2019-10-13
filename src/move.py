@@ -12,8 +12,8 @@ def to_folder(album, artist):
 
 def clean_name(name):
     bad_path_characters = '<>:"/\\|?*'
-
-    return "".join([x if not x in bad_path_characters else '_' for x in name])
+    name = "".join([x if not x in bad_path_characters else '_' for x in name])
+    return name.strip(".")
 
 def pattern_list(patterns, dest):
     for pattern in patterns:
