@@ -43,21 +43,6 @@ def download_album_art(rel, name):
     except:
         pass
 
-def move_to_folders(album, artist):
-    def clean_name(name):
-        bad_path_characters = '<>:"/\\|?*'
-
-        return "".join([x if not x in bad_path_characters else '_' for x in name])
-
-    clean_album = clean_name(album)
-    clean_artist = clean_name(artist)
-
-    move.pattern_list(["*.mp3", "*.jpg"], clean_album)
-    print "Moved files to %s folder" % clean_album
-
-    move.item(clean_album, clean_artist)
-    print "Moved album to %s folder" % clean_artist
-
 def main(argv):
     args = Args(argv)
     strategies = map(lambda url: get_strategy(url, args), args.urls)
@@ -73,7 +58,7 @@ def main(argv):
                 download_album_art(strategy.album_art, 'cover')
 
         if not args.no_folders and album_name and artist_name:
-            move_to_folders(album_name, artist_name)
+            move.to_folder(album_name, artist_name)
 
 if __name__ == '__main__':
     main(sys.argv)
