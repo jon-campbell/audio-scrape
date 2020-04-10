@@ -28,7 +28,9 @@ class AlbumDownloadStrategy(Album):
         return [{
                     'url':x["file"].values()[0],
                     'title':x["title"],
-                    'track':x["track_num"]
+                    'track':x["track_num"],
+                    'album':self.album_name,
+                    'artist':self.artist
                 } for x in get_links_json()
                   if x["file"] is not None]
 

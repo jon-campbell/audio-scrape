@@ -8,6 +8,7 @@ import re
 
 import urllib
 import eyed3
+from eyed3.id3 import Tag
 
 def parse_filename(filename):
     """Replace invalid characters with hyphens for safe filename"""
@@ -53,10 +54,18 @@ def download_list(urls, filetype):
 
 def download_tracks(tracks, filetype):
     for track in tracks:
-        (num, title, url) = (track["track"], track["title"], track["url"])
-        print("%s: %s . . . " % (num, title.encode('utf-8')), end='')
+        (num, title, url, album, artist) = (
+                track["track"],
+                unicode(track["title"]),
+                track["url"],
+                unicode(track["album"]),
+                unicode(track["artist"]))
+        print("%s: %s . . . " % (num, title), end='')
 
         filename = "%s %s.%s" % (padded(num, 1)[-2:], title[:40], filetype)
         download(url.rstrip(), filename)
+
+        t = Tag(title=title, artist=artist, album=album, album_artist=artist, track_num=num)
+        t.save(filename)
 
         print("-> %s" % filename)
