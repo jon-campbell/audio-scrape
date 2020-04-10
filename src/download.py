@@ -50,3 +50,13 @@ def download_list(urls, filetype):
 
         message = "%s complete!" % new_filename
         print(message.encode('utf-8'))
+
+def download_tracks(tracks, filetype):
+    for track in tracks:
+        (num, title, url) = (track["track"], track["title"], track["url"])
+        print("%s: %s . . . " % (num, title.encode('utf-8')), end='')
+
+        filename = "%s %s.%s" % (padded(num, 1)[-2:], title[:40], filetype)
+        download(url.rstrip(), filename)
+
+        print("-> %s" % filename)

@@ -16,14 +16,21 @@ class AlbumDownloadStrategy(Album):
 
     @property
     def links(self):
+        return map(lambda x: x["url"], self.tracks)
+
+    @property
+    def tracks(self):
         def get_links_json():
             return [json.loads(re.search(r"\[.*,$", line).group(0)[:-1])
                     for line in urllib.urlopen(self._url).readlines()
                     if re.match(r"^\s*trackinfo: ", line)][0]
 
-        return [y for x in get_links_json()
-                  if x["file"] is not None
-                  for y in x["file"].values()]
+        return [{
+                    'url':x["file"].values()[0],
+                    'title':x["title"],
+                    'track':x["track_num"]
+                } for x in get_links_json()
+                  if x["file"] is not None]
 
     @property
     def artist(self):
@@ -37,14 +44,10 @@ class AlbumDownloadStrategy(Album):
     def album_art(self):
         return self.query('a.popupImage>img').attr('src')
 
-    @property
-    def titles(self):
-        return map(lambda x: x.text_content(), self.query('.track-title'))
 
 if __name__ == "__main__":
-    tags = AlbumDownloadStrategy('http://heavypsychsoundsrecords.bandcamp.com/album/acid-mammoth-under-acid-hoof/')
+    tags = AlbumDownloadStrategy('https://dorianelectra.bandcamp.com/album/flamboyant-deluxe')
     print tags.artist
     print tags.album_name
     print tags.album_art
-    print tags.titles
-    print tags.links
+    print reduce(lambda a, x: "%s\n%s" % (a, x), map(lambda x: "%s: %s" % (x["title"], x["url"]), tags.links))

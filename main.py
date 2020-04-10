@@ -52,7 +52,10 @@ def main(argv):
         artist_name = strategy.artist
 
         if not args.no_download:
-            download.download_list(strategy.links, "mp3")
+            if hasattr(strategy, "tracks"):
+                download.download_tracks(strategy.tracks, "mp3")
+            else:
+                download.download_list(strategy.links, "mp3")
 
             if hasattr(strategy, "album_art"):
                 download_album_art(strategy.album_art, 'cover')
