@@ -11,26 +11,19 @@ from album import Album
 class AlbumDownloadStrategy(Album):
 
     def __init__(self, url):
-        def get_links():
-            tracklist = None
-            for line in urllib.urlopen(url).readlines():
-                if re.match(r"^\s*trackinfo: ", line):
-                    tracklist = json.loads(re.search(r"\[.*,$", line).group(0)[:-1])
-                    break
-
-            links = []
-            for track in tracklist:
-                if not track["file"] is None:
-                    links.extend(track["file"].values())
-
-            return links
-
         self.query = pq(urllib.urlopen(url).read())
-        self._links = get_links()
+        self._url = url
 
     @property
     def links(self):
-        return self._links
+        def get_links_json():
+            return [json.loads(re.search(r"\[.*,$", line).group(0)[:-1])
+                    for line in urllib.urlopen(self._url).readlines()
+                    if re.match(r"^\s*trackinfo: ", line)][0]
+
+        return [y for x in get_links_json()
+                  if x["file"] is not None
+                  for y in x["file"].values()]
 
     @property
     def artist(self):
