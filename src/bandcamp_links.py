@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+from pyquery import PyQuery as pq
 import urllib
 import re
 import json
@@ -10,49 +11,47 @@ from album import Album
 class AlbumDownloadStrategy(Album):
 
     def __init__(self, url):
-        self.url = url
+        def get_links():
+            tracklist = None
+            for line in urllib.urlopen(url).readlines():
+                if re.match(r"^\s*trackinfo: ", line):
+                    tracklist = json.loads(re.search(r"\[.*,$", line).group(0)[:-1])
+                    break
+
+            links = []
+            for track in tracklist:
+                if not track["file"] is None:
+                    links.extend(track["file"].values())
+
+            return links
+
+        self.query = pq(urllib.urlopen(url).read())
+        self._links = get_links()
 
     @property
     def links(self):
-        tracklist = None
-        for line in urllib.urlopen(self.url).readlines():
-            if re.match(r"^\s*trackinfo: ", line):
-                tracklist = json.loads(re.search(r"\[.*,$", line).group(0)[:-1])
-                break
-
-        links = []
-        for track in tracklist:
-            if not track["file"] is None:
-                links.extend(track["file"].values())
-
-        return links
+        return self._links
 
     @property
     def artist(self):
-        name = None
-        for line in urllib.urlopen(self.url).readlines():
-            if re.match(r"^\s*artist: ", line):
-                name = re.search(r'".*,$', line).group(0)[1:-2]
-                break
-
-        return name
+        return self.query('h3>span>a').text()
 
     @property
     def album_name(self):
-        name = None
-        for line in urllib.urlopen(self.url).readlines():
-            if re.match(r"^\s*album_title: ", line):
-                name = re.search(r'".*,$', line).group(0)[1:-2]
-                break
-
-        return name
+        return self.query('.trackTitle:first').text()
 
     @property
     def album_art(self):
-        for line in urllib.urlopen(self.url).readlines():
-            if '"image_src"' in line:
-                return re.search(r'(?<=href=")[^"]*', line).group(0)
+        return self.query('a.popupImage>img').attr('src')
 
-        return None
+    @property
+    def titles(self):
+        return map(lambda x: x.text_content(), self.query('.track-title'))
 
-
+if __name__ == "__main__":
+    tags = AlbumDownloadStrategy('http://heavypsychsoundsrecords.bandcamp.com/album/acid-mammoth-under-acid-hoof/')
+    print tags.artist
+    print tags.album_name
+    print tags.album_art
+    print tags.titles
+    print tags.links
