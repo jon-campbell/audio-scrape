@@ -36,7 +36,7 @@ class AlbumDownloadStrategy(Album):
 
     @property
     def artist(self):
-        return self.query('h3>span>a').text()
+        return self.query('h3>span>a').text().replace(' You own this', '')
 
     @property
     def album_name(self):
@@ -48,8 +48,5 @@ class AlbumDownloadStrategy(Album):
 
 
 if __name__ == "__main__":
-    tags = AlbumDownloadStrategy('https://dorianelectra.bandcamp.com/album/flamboyant-deluxe')
-    print tags.artist
-    print tags.album_name
-    print tags.album_art
-    print reduce(lambda a, x: "%s\n%s" % (a, x), map(lambda x: "%s: %s" % (x["title"], x["url"]), tags.links))
+    tags = AlbumDownloadStrategy('https://vestbotrio.com/album/gentlemen')
+    print json.dumps(tags.tracks, indent=2)
