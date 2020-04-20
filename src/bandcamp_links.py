@@ -30,7 +30,8 @@ class AlbumDownloadStrategy(Album):
                     'title':x["title"],
                     'track':x["track_num"],
                     'album':self.album_name,
-                    'artist':self.artist
+                    'artist':self.artist,
+                    'art_url':self.album_art
                 } for x in get_links_json()
                   if x["file"] is not None]
 
@@ -48,5 +49,5 @@ class AlbumDownloadStrategy(Album):
 
 
 if __name__ == "__main__":
-    tags = AlbumDownloadStrategy('https://vestbotrio.com/album/gentlemen')
+    tags = AlbumDownloadStrategy('https://exitoz.bandcamp.com/')
     print json.dumps(tags.tracks, indent=2)

@@ -10,21 +10,8 @@ import urllib
 import eyed3
 from eyed3.id3 import Tag
 
-def parse_filename(filename):
-    """Replace invalid characters with hyphens for safe filename"""
-    invalid_chars = r"[\\/:*?<>|]"
-    filename = re.sub(invalid_chars, "-", filename)
-    return filename
-
-def insert_before_extension(filename, text):
-    """Insert a string before the last dot in the filename"""
-    parts = filename.split('.')
-    parts[-2] += text
-    return '.'.join(parts)
-
 def download(url, filename):
     """Download binary from url to file"""
-    filename = parse_filename(filename)
     with open(filename, "wb+") as output:
         output.write(urllib.urlopen(url).read())
 
@@ -34,7 +21,17 @@ def padded(number, zeros):
     return output
 
 def download_list(urls, filetype):
-    """Download a list of urls to numbered binary files"""
+    def parse_filename(filename):
+        invalid_chars = r"[\\/:*?<>|]"
+        filename = re.sub(invalid_chars, "-", filename)
+        return filename
+
+    def insert_before_extension(filename, text):
+        """Insert a string before the last dot in the filename"""
+        parts = filename.split('.')
+        parts[-2] += text
+        return '.'.join(parts)
+
     for num, url in enumerate(urls):
         print("Downloading file %s . . . " % (num + 1), end='')
         filename = "%s.%s" % (padded(num + 1, 1)[-2:], filetype)
@@ -53,6 +50,13 @@ def download_list(urls, filetype):
         print(message.encode('utf-8'))
 
 def download_tracks(tracks, filetype):
+    def to_valid_directory(name):
+        bad_path_characters = '<>:"/\\|?*'
+        name = "".join([x if not x in bad_path_characters else '_' for x in name])
+        return name.strip(".")
+
+    is_first_track = True
+
     for track in tracks:
         (num, title, url, album, artist) = (
                 track["track"],
@@ -62,10 +66,23 @@ def download_tracks(tracks, filetype):
                 unicode(track["artist"]))
         print("%s: %s . . . " % (num, title), end='')
 
+        if is_first_track:
+            path = os.path.join(to_valid_directory(artist), to_valid_directory(album))
+            try:
+                os.makedirs(path)
+            except OSError:
+                pass
+            art_url = track["art_url"]
+            art_path = os.path.join(path, "cover.jpg")
+            download(art_url, art_path)
+            is_first_track = False
+
         filename = "%s %s.%s" % (padded(num, 1)[-2:], title[:40], filetype)
-        download(url.rstrip(), filename)
+        filepath = os.path.join(path, filename)
+        download(url.rstrip(), filepath)
 
         t = Tag(title=title, artist=artist, album=album, album_artist=artist, track_num=num)
-        t.save(filename)
+        t.save(filepath)
 
-        print("-> %s" % filename)
+        print("-> %s" % filepath)
+
