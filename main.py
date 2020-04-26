@@ -44,7 +44,6 @@ def main(argv):
         if not args.no_download:
             if hasattr(strategy, "tracks"):
                 download.download_tracks(strategy.tracks, "mp3")
-                download_album_art(strategy.album_art, 'cover')
             else:
                 download.download_list(strategy.links, "mp3")
 
