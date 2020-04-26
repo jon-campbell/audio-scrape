@@ -27,10 +27,10 @@ class AlbumDownloadStrategy(Album):
 
         return [{
                     'url':x["file"].values()[0],
-                    'title':x["title"],
+                    'title':x["title"].strip(),
                     'track':x["track_num"],
-                    'album':self.album_name,
-                    'artist':self.artist,
+                    'album':self.album_name.strip(),
+                    'artist':self.artist.strip(),
                     'art_url':self.album_art
                 } for x in get_links_json()
                   if x["file"] is not None]

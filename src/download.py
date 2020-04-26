@@ -50,13 +50,12 @@ def download_list(urls, filetype):
         print(message.encode('utf-8'))
 
 def download_tracks(tracks, filetype):
-    def to_valid_directory(name):
+    def to_valid_filename(name):
         bad_path_characters = '<>:"/\\|?*'
         name = "".join([x if not x in bad_path_characters else '_' for x in name])
         return name.strip(".")
 
     is_first_track = True
-
     for track in tracks:
         (num, title, url, album, artist) = (
                 track["track"],
@@ -66,8 +65,8 @@ def download_tracks(tracks, filetype):
                 unicode(track["artist"]))
         print("%s: %s . . . " % (num, title), end='')
 
+        path = os.path.join(to_valid_filename(artist), to_valid_filename(album))
         if is_first_track:
-            path = os.path.join(to_valid_directory(artist), to_valid_directory(album))
             try:
                 os.makedirs(path)
             except OSError:
@@ -77,7 +76,7 @@ def download_tracks(tracks, filetype):
             download(art_url, art_path)
             is_first_track = False
 
-        filename = "%s %s.%s" % (padded(num, 1)[-2:], title[:40], filetype)
+        filename = "%s %s.%s" % (padded(num, 1)[-2:], to_valid_filename(title[:40]), filetype)
         filepath = os.path.join(path, filename)
         download(url.rstrip(), filepath)
 
