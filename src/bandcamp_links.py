@@ -11,7 +11,7 @@ from album import Album
 class AlbumDownloadStrategy(Album):
 
     def __init__(self, url):
-        self.query = pq(urllib.urlopen(url).read())
+        self.query = pq(url, encoding='utf8')
         self._url = url
 
     @property
@@ -37,11 +37,11 @@ class AlbumDownloadStrategy(Album):
 
     @property
     def artist(self):
-        return self.query('h3>span>a').text().replace(' You own this', '')
+        return self.query('h3>span>a').text().replace(' You own this', '').encode('latin-1').decode('utf-8')
 
     @property
     def album_name(self):
-        return self.query('.trackTitle:first').text()
+        return self.query('.trackTitle:first').text().encode('latin-1').decode('utf-8')
 
     @property
     def album_art(self):
@@ -49,5 +49,5 @@ class AlbumDownloadStrategy(Album):
 
 
 if __name__ == "__main__":
-    tags = AlbumDownloadStrategy('https://exitoz.bandcamp.com/')
+    tags = AlbumDownloadStrategy('https://gostaberlingssaga.bandcamp.com/album/detta-har-h-nt')
     print json.dumps(tags.tracks, indent=2)
