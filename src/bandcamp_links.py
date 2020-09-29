@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 
 from pyquery import PyQuery as pq
+from HTMLParser import HTMLParser
 import urllib
 import re
 import json
@@ -21,9 +22,7 @@ class AlbumDownloadStrategy(Album):
     @property
     def tracks(self):
         def get_links_json():
-            return [json.loads(re.search(r"\[.*,$", line).group(0)[:-1])
-                    for line in urllib.urlopen(self._url).readlines()
-                    if re.match(r"^\s*trackinfo: ", line)][0]
+            return json.loads(self.query('script[data-tralbum]:first').attr('data-tralbum'))['trackinfo']
 
         return [{
                     'url':x["file"].values()[0],
@@ -49,5 +48,5 @@ class AlbumDownloadStrategy(Album):
 
 
 if __name__ == "__main__":
-    tags = AlbumDownloadStrategy('https://gostaberlingssaga.bandcamp.com/album/detta-har-h-nt')
+    tags = AlbumDownloadStrategy('<script data-tralbum="{&quot;prop&quot;: &quot;val&quot;}" />')
     print json.dumps(tags.tracks, indent=2)
